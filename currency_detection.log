@@ -1,0 +1,170 @@
+2024-09-29 09:05:22,309:INFO:Starting Currency Detection Process.
+2024-09-29 09:05:23,551:INFO:Template images loaded successfully.
+2024-09-29 09:05:26,348:INFO:Uploaded images loaded and preprocessed successfully.
+2024-09-29 09:05:26,351:INFO:
+Aligning uploaded images with LKR20 templates...
+2024-09-29 09:05:27,540:INFO:Images aligned successfully.
+2024-09-29 09:05:28,689:INFO:Images aligned successfully.
+2024-09-29 09:05:28,692:INFO:
+Aligning uploaded images with LKR50 templates...
+2024-09-29 09:05:29,678:INFO:Images aligned successfully.
+2024-09-29 09:05:30,731:INFO:Images aligned successfully.
+2024-09-29 09:05:30,736:INFO:
+Aligning uploaded images with LKR100 templates...
+2024-09-29 09:05:31,802:INFO:Images aligned successfully.
+2024-09-29 09:05:32,873:INFO:Images aligned successfully.
+2024-09-29 09:05:32,876:INFO:
+Aligning uploaded images with LKR500 templates...
+2024-09-29 09:05:33,933:INFO:Images aligned successfully.
+2024-09-29 09:05:34,935:INFO:Images aligned successfully.
+2024-09-29 09:05:34,938:INFO:
+Aligning uploaded images with LKR1000 templates...
+2024-09-29 09:05:35,969:INFO:Images aligned successfully.
+2024-09-29 09:05:37,025:INFO:Images aligned successfully.
+2024-09-29 09:05:37,028:INFO:
+Aligning uploaded images with LKR5000 templates...
+2024-09-29 09:05:38,135:INFO:Images aligned successfully.
+2024-09-29 09:05:39,146:INFO:Images aligned successfully.
+2024-09-29 09:05:39,150:INFO:
+Processing LKR20...
+2024-09-29 09:09:17,678:INFO:Starting Currency Detection Process.
+2024-09-29 09:09:18,836:INFO:Template images loaded successfully.
+2024-09-29 09:09:21,671:INFO:Uploaded images loaded and preprocessed successfully.
+2024-09-29 09:09:21,674:INFO:
+Aligning uploaded images with LKR20 templates...
+2024-09-29 09:09:22,811:INFO:Images aligned successfully.
+2024-09-29 09:09:23,940:INFO:Images aligned successfully.
+2024-09-29 09:09:23,944:INFO:
+Aligning uploaded images with LKR50 templates...
+2024-09-29 09:09:24,929:INFO:Images aligned successfully.
+2024-09-29 09:09:26,000:INFO:Images aligned successfully.
+2024-09-29 09:09:26,003:INFO:
+Aligning uploaded images with LKR100 templates...
+2024-09-29 09:09:27,061:INFO:Images aligned successfully.
+2024-09-29 09:09:28,110:INFO:Images aligned successfully.
+2024-09-29 09:09:28,114:INFO:
+Aligning uploaded images with LKR500 templates...
+2024-09-29 09:09:29,263:INFO:Images aligned successfully.
+2024-09-29 09:09:30,287:INFO:Images aligned successfully.
+2024-09-29 09:09:30,291:INFO:
+Aligning uploaded images with LKR1000 templates...
+2024-09-29 09:09:31,320:INFO:Images aligned successfully.
+2024-09-29 09:09:32,396:INFO:Images aligned successfully.
+2024-09-29 09:09:32,400:INFO:
+Aligning uploaded images with LKR5000 templates...
+2024-09-29 09:09:33,432:INFO:Images aligned successfully.
+2024-09-29 09:09:34,544:INFO:Images aligned successfully.
+2024-09-29 09:09:34,547:INFO:
+Processing LKR20...
+2024-09-29 12:46:15,633:INFO:Starting Currency Detection Process.
+2024-09-29 12:46:16,904:INFO:Template images loaded successfully.
+2024-09-29 12:46:53,538:INFO:Uploaded images loaded and preprocessed successfully.
+2024-09-29 12:46:53,541:INFO:
+Aligning uploaded images with LKR20 templates...
+2024-09-29 12:47:02,968:INFO:Images aligned successfully.
+2024-09-29 12:47:05,260:INFO:Images aligned successfully.
+2024-09-29 12:47:05,264:INFO:
+Aligning uploaded images with LKR50 templates...
+2024-09-29 12:47:08,769:INFO:Images aligned successfully.
+2024-09-29 12:47:10,922:INFO:Images aligned successfully.
+2024-09-29 12:47:10,925:INFO:
+Aligning uploaded images with LKR100 templates...
+2024-09-29 12:47:12,937:INFO:Images aligned successfully.
+2024-09-29 12:47:14,427:INFO:Images aligned successfully.
+2024-09-29 12:47:14,432:INFO:
+Aligning uploaded images with LKR500 templates...
+2024-09-29 12:47:16,247:INFO:Images aligned successfully.
+2024-09-29 12:47:17,732:INFO:Images aligned successfully.
+2024-09-29 12:47:17,736:INFO:
+Aligning uploaded images with LKR1000 templates...
+2024-09-29 12:47:19,384:INFO:Images aligned successfully.
+2024-09-29 12:47:20,899:INFO:Images aligned successfully.
+2024-09-29 12:47:20,904:INFO:
+Aligning uploaded images with LKR5000 templates...
+2024-09-29 12:47:22,353:INFO:Images aligned successfully.
+2024-09-29 12:47:23,752:INFO:Images aligned successfully.
+2024-09-29 12:47:23,756:INFO:
+Processing LKR20...
+2024-09-29 12:47:27,843:INFO: - Watermark Detected: False (Score: 0.23)
+2024-09-29 12:47:31,479:INFO:Security Thread Detection: Detected
+2024-09-29 12:47:31,482:INFO: - Security Thread Detected: True
+2024-09-29 12:47:35,399:INFO: - Cornerstone Detected: False (Score: 0.21)
+2024-09-29 12:47:39,075:INFO:Extra Small Text Detection: Detected
+2024-09-29 12:47:39,075:INFO: - Extra Small Text Detected: True
+2024-09-29 12:47:56,625:INFO:Blind Recognition Detection: Not Detected (Score: 0.01)
+2024-09-29 12:48:01,801:INFO: - Blind Recognition Feature Detected: False (Score: 0.01)
+2024-09-29 12:48:01,885:INFO:Raised Paint Detection: Detected (Variance: 2776.03)
+2024-09-29 12:48:01,885:INFO: - Raised Paint Detected: True
+2024-09-29 12:48:07,760:INFO:See-Through 1 Detection - Front Score: 0.24, Back Score: 0.38
+2024-09-29 12:48:13,643:INFO:See-Through 2 Detection - Front Score: 0.24, Back Score: 0.28
+2024-09-29 12:48:19,725:INFO:See-Through 3 Detection - Front Score: 0.21, Back Score: 0.24
+2024-09-29 12:48:19,725:INFO:No See-Through Features Detected.
+2024-09-29 12:48:19,725:INFO: - See-Through Feature Detected: False
+2024-09-29 12:48:25,370:INFO: - Front Image Match: False (Score: 0.17)
+2024-09-29 12:48:25,370:INFO: - Back Image Match: False (Score: 0.06)
+2024-09-29 12:48:25,370:INFO:Feature detection completed for all templates.
+2024-09-29 12:48:25,370:INFO:
+Processing LKR50...
+2024-09-29 12:48:28,796:INFO: - Watermark Detected: False (Score: 0.14)
+2024-09-29 12:48:36,508:INFO:Security Thread Detection: Detected
+2024-09-29 12:48:36,508:INFO: - Security Thread Detected: True
+2024-09-29 12:48:39,863:INFO: - Cornerstone Detected: False (Score: 0.22)
+2024-09-29 12:48:43,167:INFO:Extra Small Text Detection: Detected
+2024-09-29 12:48:43,167:INFO: - Extra Small Text Detected: True
+2024-09-29 12:48:52,469:INFO:Blind Recognition Detection: Not Detected (Score: 0.01)
+2024-09-29 12:48:53,509:INFO: - Blind Recognition Feature Detected: False (Score: 0.01)
+2024-09-29 12:48:53,594:INFO:Raised Paint Detection: Detected (Variance: 8498.79)
+2024-09-29 12:48:53,594:INFO: - Raised Paint Detected: True
+2024-09-29 12:48:58,559:INFO:See-Through 1 Detection - Front Score: 0.29, Back Score: 0.24
+2024-09-29 12:49:03,786:INFO:See-Through 2 Detection - Front Score: 0.27, Back Score: 0.25
+2024-09-29 12:49:08,898:INFO:See-Through 3 Detection - Front Score: 0.19, Back Score: 0.17
+2024-09-29 12:49:08,898:INFO:No See-Through Features Detected.
+2024-09-29 12:49:08,898:INFO: - See-Through Feature Detected: False
+2024-09-29 12:49:10,627:INFO:Early termination: Found high-confidence match at scale 1.0, angle 0, score 0.9706441760063171
+2024-09-29 12:49:17,079:INFO:Early termination: Found high-confidence match at scale 1.0, angle 0, score 0.9998767971992493
+2024-09-29 12:49:19,927:INFO: - Front Image Match: True (Score: 0.97)
+2024-09-29 12:49:19,927:INFO: - Back Image Match: True (Score: 1.00)
+2024-09-29 12:49:19,927:INFO:Feature detection completed for all templates.
+2024-09-29 12:49:19,927:INFO:
+Processing LKR100...
+2024-09-29 12:49:23,090:INFO: - Watermark Detected: False (Score: 0.17)
+2024-09-29 12:49:24,303:INFO:Security Thread Detection: Detected
+2024-09-29 12:49:24,303:INFO: - Security Thread Detected: True
+2024-09-29 12:49:27,740:INFO: - Cornerstone Detected: False (Score: 0.26)
+2024-09-29 12:49:28,822:INFO:Extra Small Text Detection: Detected
+2024-09-29 12:49:28,822:INFO: - Extra Small Text Detected: True
+2024-09-29 12:49:39,190:INFO:Blind Recognition Detection: Not Detected (Score: 0.02)
+2024-09-29 12:49:40,229:INFO: - Blind Recognition Feature Detected: False (Score: 0.02)
+2024-09-29 12:49:40,309:INFO:Raised Paint Detection: Detected (Variance: 1405.45)
+2024-09-29 12:49:40,309:INFO: - Raised Paint Detected: True
+2024-09-29 12:49:45,508:INFO:See-Through 1 Detection - Front Score: 0.39, Back Score: 0.37
+2024-09-29 12:49:50,694:INFO:See-Through 2 Detection - Front Score: 0.28, Back Score: 0.26
+2024-09-29 12:49:56,313:INFO:See-Through 3 Detection - Front Score: 0.21, Back Score: 0.25
+2024-09-29 12:49:56,313:INFO:No See-Through Features Detected.
+2024-09-29 12:49:56,313:INFO: - See-Through Feature Detected: False
+2024-09-29 12:50:01,818:INFO: - Front Image Match: False (Score: 0.06)
+2024-09-29 12:50:01,818:INFO: - Back Image Match: False (Score: 0.07)
+2024-09-29 12:50:01,818:INFO:Feature detection completed for all templates.
+2024-09-29 12:50:01,819:INFO:
+Processing LKR500...
+2024-09-29 12:50:05,421:INFO: - Watermark Detected: False (Score: 0.14)
+2024-09-29 12:50:07,864:INFO:Security Thread Detection: Detected
+2024-09-29 12:50:07,864:INFO: - Security Thread Detected: True
+2024-09-29 12:50:11,387:INFO: - Cornerstone Detected: False (Score: 0.21)
+2024-09-29 12:50:12,258:INFO:Extra Small Text Detection: Detected
+2024-09-29 12:50:12,258:INFO: - Extra Small Text Detected: True
+2024-09-29 12:50:20,493:INFO:Blind Recognition Detection: Not Detected (Score: 0.09)
+2024-09-29 12:50:31,670:INFO: - Blind Recognition Feature Detected: False (Score: 0.09)
+2024-09-29 12:50:31,773:INFO:Raised Paint Detection: Detected (Variance: 3747.04)
+2024-09-29 12:50:31,773:INFO: - Raised Paint Detected: True
+2024-09-29 12:50:37,273:INFO:See-Through 1 Detection - Front Score: 0.29, Back Score: 0.33
+2024-09-29 12:50:42,833:INFO:See-Through 2 Detection - Front Score: 0.18, Back Score: 0.17
+2024-09-29 12:50:48,587:INFO:See-Through 3 Detection - Front Score: 0.16, Back Score: 0.20
+2024-09-29 12:50:48,587:INFO:No See-Through Features Detected.
+2024-09-29 12:50:48,587:INFO: - See-Through Feature Detected: False
+2024-09-29 12:50:54,745:INFO: - Front Image Match: False (Score: 0.11)
+2024-09-29 12:50:54,746:INFO: - Back Image Match: False (Score: 0.11)
+2024-09-29 12:50:54,746:INFO:Feature detection completed for all templates.
+2024-09-29 12:50:54,746:INFO:
+Processing LKR1000...
+2024-09-29 12:50:58,210:INFO: - Watermark Detected: False (Score: 0.15)
