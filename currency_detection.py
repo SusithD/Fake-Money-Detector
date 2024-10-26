@@ -3,6 +3,9 @@ import os
 import numpy as np
 from skimage.metrics import structural_similarity as ssim
 
+# ORB detector for feature matching
+orb = cv2.ORB_create()
+
 # Path to the template directory
 TEMPLATE_DIR = "currency_templates/"
 
@@ -22,6 +25,41 @@ def load_templates():
                 }
     return templates
 
+# Color Consistency Check
+def check_color_consistency(image, expected_hue_range=(30, 90)):
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    mask = cv2.inRange(hsv, (expected_hue_range[0], 50, 50), (expected_hue_range[1], 255, 255))
+    return np.sum(mask) > 5000  # Threshold for expected color presence
+
+# Micro-Text Detection
+def detect_micro_text(image):
+    blurred = cv2.GaussianBlur(image, (5, 5), 0)
+    edges = cv2.Canny(blurred, 100, 200)
+    return np.sum(edges) > 1500  # Threshold for high-density edges indicating micro-text
+
+# Hologram/Security Foil Detection
+def detect_hologram(image):
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    reflection_mask = cv2.inRange(hsv, (0, 0, 200), (180, 50, 255))
+    return np.sum(reflection_mask) > 3000  # Threshold for reflective hologram areas
+
+# Image Statistical Distribution Analysis
+def analyze_image_distribution(image):
+    hist = cv2.calcHist([image], [0], None, [256], [0, 256])
+    # Check for anomalies in the histogram
+    return np.var(hist) < 1000  # Adjust threshold as necessary
+
+# ORB feature matching
+def orb_match(input_image, template_image):
+    kp1, des1 = orb.detectAndCompute(input_image, None)
+    kp2, des2 = orb.detectAndCompute(template_image, None)
+    
+    bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+    matches = bf.match(des1, des2)
+    matches = sorted(matches, key=lambda x: x.distance)
+    
+    return len(matches) / min(len(kp1), len(kp2)) > 0.2
+
 # Preprocess image
 def preprocess_image(image, size=(600, 300)):
     if image is None:
@@ -33,22 +71,6 @@ def compare_images(input_image, template_image):
     template_resized = cv2.resize(template_image, input_image.shape[::-1])
     score, _ = ssim(input_image, template_resized, full=True)
     return score
-
-# Detect Watermark
-def detect_watermark(image):
-    _, thresholded = cv2.threshold(image, 128, 255, cv2.THRESH_BINARY)
-    return np.sum(thresholded == 255) > 1000  # Arbitrary threshold for watermark presence
-
-# Detect Security Thread
-def detect_security_thread(image):
-    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-    mask = cv2.inRange(hsv, (0, 0, 50), (180, 255, 150))
-    return np.sum(mask) > 2000  # Threshold to confirm thread presence
-
-# Detect Raised Print
-def detect_raised_print(image):
-    edges = cv2.Canny(image, 100, 200)
-    return np.sum(edges) > 1000  # Arbitrary edge count threshold
 
 # Main currency detection and fake note validation
 def identify_currency_and_validate(input_front_image_path, input_back_image_path, similarity_threshold=0.7):
@@ -81,26 +103,30 @@ def identify_currency_and_validate(input_front_image_path, input_back_image_path
     if best_score > similarity_threshold:
         print(f"Detected Currency: {best_match} Rupees (Score: {best_score:.2f})")
         
-        # Load color image for advanced feature detection
         input_front_color = cv2.imread(input_front_image_path)
-        input_back_color = cv2.imread(input_back_image_path)
         
         # Perform fake money detection on the detected currency
-        watermark_present = detect_watermark(input_front_gray)
-        thread_present = detect_security_thread(input_front_color)
-        raised_print_present = detect_raised_print(input_front_gray)
+        color_consistency = check_color_consistency(input_front_color)
+        micro_text_present = detect_micro_text(input_front_gray)
+        hologram_present = detect_hologram(input_front_color)
+        image_distribution_normal = analyze_image_distribution(input_front_color)
+        orb_feature_match = orb_match(input_front_gray, templates[best_match]['front'])
         
-        # Verification - Confirm authenticity by checking each security feature
-        if watermark_present and thread_present and raised_print_present:
-            print("The note is authentic.")
+        # Combine checks for final verification
+        if all([color_consistency, micro_text_present, hologram_present, image_distribution_normal, orb_feature_match]):
+            print("The note is likely authentic.")
         else:
             print("Warning: This note may be counterfeit.")
-            if not watermark_present:
-                print("Watermark not detected.")
-            if not thread_present:
-                print("Security thread not detected.")
-            if not raised_print_present:
-                print("Raised print not detected.")
+            if not color_consistency:
+                print("Color consistency check failed.")
+            if not micro_text_present:
+                print("Micro-text not detected.")
+            if not hologram_present:
+                print("Hologram not detected.")
+            if not image_distribution_normal:
+                print("Image distribution check failed.")
+            if not orb_feature_match:
+                print("Key features not matched.")
         
         return best_match
     else:
@@ -108,6 +134,6 @@ def identify_currency_and_validate(input_front_image_path, input_back_image_path
         return None
 
 # Example usage
-input_front_image_path = "uploaded_notes/front.jpg"  # Replace with the path to your input front image
-input_back_image_path = "uploaded_notes/back.jpg"    # Replace with the path to your input back image
+input_front_image_path = "uploaded_notes/front.jpg"
+input_back_image_path = "uploaded_notes/back.jpg"
 identify_currency_and_validate(input_front_image_path, input_back_image_path)
