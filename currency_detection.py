@@ -150,6 +150,6 @@ def identify_currency_and_validate(input_front_image_path, input_back_image_path
         return None
 
 # Example usage
-input_front_image_path = "uploaded_notes/edited front 20.jpg"
-input_back_image_path = "uploaded_notes/back.jpg"
+input_front_image_path = "uploaded_notes/front 100.jpg"
+input_back_image_path = "uploaded_notes/back 50.jpg"
 identify_currency_and_validate(input_front_image_path, input_back_image_path)
