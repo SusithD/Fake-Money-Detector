@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 # Step 1: Define Directory Paths
 # ===========================
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(os.path.abspath(_file_))
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'currency_templates')
 UPLOADED_NOTES_DIR = os.path.join(BASE_DIR, 'uploaded_notes')
 
@@ -754,5 +754,5 @@ def main():
     print("=========================")
     print(f"Identified Currency Note: {final_result}")
 
-if __name__ == "__main__":
+if _name_ == "_main_":
     main()
