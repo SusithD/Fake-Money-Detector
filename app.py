@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 import os
 import cv2
 import numpy as np
@@ -9,6 +9,7 @@ TEMPLATE_DIR = "currency_templates/"
 
 # Initialize Flask application
 app = Flask(__name__)
+app.secret_key = 'supersecretkey'
 UPLOAD_FOLDER = 'uploaded_notes/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -108,22 +109,14 @@ def identify_currency_and_validate(input_front_image_path, input_back_image_path
     best_match = max(match_scores, key=match_scores.get)
     best_score = match_scores[best_match]
 
-    print(f"\nStep 2: Matching Scores")
-    print(f"Best Match: {best_match}, Score: {best_score:.2f}")
-
     if best_score > similarity_threshold:
-        print(f"\nStep 3: Detected Currency: {best_match} (Score: {best_score:.2f})")
         front_template = templates[best_match]['front']
-
-        # Feature detections with stricter thresholds
-        print("\nStep 4: Detecting Features")
         watermark_detected = detect_watermark(cv2.cvtColor(input_front_image, cv2.COLOR_BGR2GRAY), front_template)
         micro_text_present = detect_micro_text(cv2.cvtColor(input_front_image, cv2.COLOR_BGR2GRAY))
         see_through_present = detect_see_through(input_front_image)
         security_thread_present = detect_security_thread(input_front_image)
         intaglio_prints_present = detect_intaglio_prints(cv2.cvtColor(input_front_image, cv2.COLOR_BGR2GRAY))
 
-        # Scoring and authenticity check with weighted thresholds
         feature_score = (
             0.25 * watermark_detected + 
             0.2 * micro_text_present +
@@ -131,8 +124,6 @@ def identify_currency_and_validate(input_front_image_path, input_back_image_path
             0.1 * security_thread_present +
             0.3 * intaglio_prints_present
         )
-
-        print(f"Feature Score: {feature_score:.2f}")
 
         if feature_score > 0.85:
             authenticity_message = "The note is likely authentic."
@@ -149,7 +140,6 @@ def identify_currency_and_validate(input_front_image_path, input_back_image_path
             if not intaglio_prints_present:
                 authenticity_message += " Intaglio prints not detected."
 
-        # Return the currency detected along with authenticity message
         return best_match, authenticity_message
     else:
         return None, "No accurate match found. Please try a clearer image."
@@ -161,20 +151,32 @@ def index():
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
+    if 'front' not in request.files or 'back' not in request.files:
+        error_message = 'Please upload both front and back images.'
+        return render_template('index.html', authenticity_message=error_message)
+
     front_image = request.files['front']
     back_image = request.files['back']
     
-    if front_image and back_image:
-        front_path = os.path.join(app.config['UPLOAD_FOLDER'], front_image.filename)
-        back_path = os.path.join(app.config['UPLOAD_FOLDER'], back_image.filename)
-        
-        front_image.save(front_path)
-        back_image.save(back_path)
-
-        result, authenticity_message = identify_currency_and_validate(front_path, back_path)
-        return render_template('index.html', result=result, authenticity_message=authenticity_message)
+    if not front_image or not back_image:
+        error_message = 'Both images are required.'
+        return render_template('index.html', authenticity_message=error_message)
     
-    return redirect(url_for('index'))
+    if not front_image.filename.lower().endswith(('.png', '.jpg', '.jpeg')) or \
+       not back_image.filename.lower().endswith(('.png', '.jpg', '.jpeg')):
+        error_message = 'Only image files (.jpg, .jpeg, .png) are allowed.'
+        return render_template('index.html', authenticity_message=error_message)
+    
+    front_path = os.path.join(app.config['UPLOAD_FOLDER'], front_image.filename)
+    back_path = os.path.join(app.config['UPLOAD_FOLDER'], back_image.filename)
+    
+    front_image.save(front_path)
+    back_image.save(back_path)
+
+    result, authenticity_message = identify_currency_and_validate(front_path, back_path)
+
+    # Pass result and authenticity_message to the template for display
+    return render_template('index.html', result=result, authenticity_message=authenticity_message)
 
 if __name__ == '__main__':
     app.run(debug=True)

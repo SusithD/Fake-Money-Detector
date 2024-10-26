@@ -10,18 +10,28 @@
 <body>
     <div class="container">
         <h1>Currency Detection</h1>
-        <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
-            <label for="front">Upload Front Image:</label>
-            <input type="file" name="front" accept="image/*" required id="front">
-            <label for="back">Upload Back Image:</label>
-            <input type="file" name="back" accept="image/*" required id="back">
-            <input type="submit" value="Upload">
+        <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" id="uploadForm">
+            <div class="form-group">
+                <label for="front">Upload Front Image:</label>
+                <input type="file" name="front" accept="image/*" required id="front">
+            </div>
+            <div class="form-group">
+                <label for="back">Upload Back Image:</label>
+                <input type="file" name="back" accept="image/*" required id="back">
+            </div>
+            <button type="submit">Check Currency</button>
+            <p id="errorMessage" class="error-message"></p>
         </form>
 
         {% if result %}
         <div class="result">
             <h2>Result:</h2>
-            <p>Detected Currency: {{ result }}</p>
+            <p>Detected Currency: <strong>{{ result }}</strong></p>
+            <p>{{ authenticity_message }}</p>
+        </div>
+        {% elif authenticity_message %}
+        <div class="error">
+            <p>{{ authenticity_message }}</p>
         </div>
         {% endif %}
     </div>
