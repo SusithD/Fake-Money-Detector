@@ -2,6 +2,7 @@ import cv2
 import os
 import numpy as np
 from skimage.metrics import structural_similarity as ssim
+import matplotlib.pyplot as plt
 
 # Path to the template directory
 TEMPLATE_DIR = "currency_templates/"
@@ -21,13 +22,19 @@ def load_templates():
                 }
     return templates
 
-# Enhanced watermark detection with stricter thresholds
+# Function to display images inline with titles
+def show_image(image, title='Image', cmap=None):
+    plt.imshow(image, cmap=cmap)
+    plt.title(title)
+    plt.axis('off')  # Hide axes
+    plt.show()
+
+# Enhanced watermark detection
 def detect_watermark(image, template_front):
     front_resized = cv2.resize(template_front, (image.shape[1], image.shape[0]))
     _, binary_image = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
     _, binary_template = cv2.threshold(front_resized, 127, 255, cv2.THRESH_BINARY)
     score, _ = ssim(binary_image, binary_template, full=True)
-    print(f"Watermark SSIM Score: {score:.2f}")
     return score > 0.80  # Increased threshold for robustness
 
 # Microtext detection with density check
@@ -36,14 +43,12 @@ def detect_micro_text(image):
     _, binary = cv2.threshold(blurred, 127, 255, cv2.THRESH_BINARY_INV)
     contours, _ = cv2.findContours(binary, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     microtext_count = sum(1 for cnt in contours if 50 < cv2.contourArea(cnt) < 100)  # Adjusted density range
-    print(f"Microtext Count: {microtext_count}")
     return 100 < microtext_count < 5000  # Narrowed acceptable range for microtext density
 
 # See-Through Feature Detection
 def detect_see_through(image):
     flipped_image = cv2.flip(image, 1)
     score, _ = ssim(cv2.cvtColor(image, cv2.COLOR_BGR2GRAY), cv2.cvtColor(flipped_image, cv2.COLOR_BGR2GRAY), full=True)
-    print(f"See-Through Feature SSIM Score: {score:.2f}")
     return score < 0.90  # Higher score indicates misalignment or absence
 
 # Security Thread Detection
@@ -53,7 +58,6 @@ def detect_security_thread(image):
     mask_green = cv2.inRange(hsv, (40, 100, 100), (80, 255, 255))  # Detecting green
     combined_mask = cv2.bitwise_or(mask_red, mask_green)
     thread_intensity = np.sum(combined_mask) / 255
-    print(f"Security Thread Intensity: {thread_intensity}")
     return thread_intensity > 5000  # Threshold for detecting the security thread
 
 # Intaglio Prints Detection
@@ -63,14 +67,12 @@ def detect_intaglio_prints(image):
     _, binary = cv2.threshold(laplacian_abs, 30, 255, cv2.THRESH_BINARY)
     contours, _ = cv2.findContours(binary, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     intaglio_count = sum(1 for cnt in contours if cv2.contourArea(cnt) > 100)  # Adjust based on expected texture
-    print(f"Intaglio Prints Count: {intaglio_count}")
     return intaglio_count > 20  # Minimum count for detecting intaglio prints
 
 # Template matching with histogram analysis for color consistency
 def compare_images(input_image, template_image):
     template_resized = cv2.resize(template_image, input_image.shape[::-1])
     score, _ = ssim(input_image, template_resized, full=True)
-    print(f"SSIM Score: {score:.2f}")
     return score
 
 # Histogram comparison for color consistency
@@ -83,16 +85,20 @@ def histogram_similarity(img1, img2):
 def identify_currency_and_validate(input_front_image_path, input_back_image_path, similarity_threshold=0.75):
     input_front_image = cv2.imread(input_front_image_path, cv2.IMREAD_COLOR)
     input_back_image = cv2.imread(input_back_image_path, cv2.IMREAD_GRAYSCALE)
-    
+
     if input_front_image is None or input_back_image is None:
         print("Error: Could not load one or both input images.")
         return None
-    
+
     templates = load_templates()
     if not templates:
         print("No templates found in the specified directory.")
         return None
-    
+
+    print("Step 1: Load and Process Input Images")
+    show_image(cv2.cvtColor(input_front_image, cv2.COLOR_BGR2RGB), "Input Front Image")
+    show_image(input_back_image, "Input Back Image")
+
     match_scores = {}
     for currency, sides in templates.items():
         front_score = compare_images(cv2.cvtColor(input_front_image, cv2.COLOR_BGR2GRAY), sides['front'])
@@ -104,20 +110,22 @@ def identify_currency_and_validate(input_front_image_path, input_back_image_path
 
     best_match = max(match_scores, key=match_scores.get)
     best_score = match_scores[best_match]
-    
+
+    print(f"\nStep 2: Matching Scores")
     print(f"Best Match: {best_match}, Score: {best_score:.2f}")
 
     if best_score > similarity_threshold:
-        print(f"Detected Currency: {best_match} (Score: {best_score:.2f})")
+        print(f"\nStep 3: Detected Currency: {best_match} (Score: {best_score:.2f})")
         front_template = templates[best_match]['front']
-        
+
         # Feature detections with stricter thresholds
+        print("\nStep 4: Detecting Features")
         watermark_detected = detect_watermark(cv2.cvtColor(input_front_image, cv2.COLOR_BGR2GRAY), front_template)
         micro_text_present = detect_micro_text(cv2.cvtColor(input_front_image, cv2.COLOR_BGR2GRAY))
         see_through_present = detect_see_through(input_front_image)
         security_thread_present = detect_security_thread(input_front_image)
         intaglio_prints_present = detect_intaglio_prints(cv2.cvtColor(input_front_image, cv2.COLOR_BGR2GRAY))
-        
+
         # Scoring and authenticity check with weighted thresholds
         feature_score = (
             0.25 * watermark_detected + 
@@ -144,12 +152,17 @@ def identify_currency_and_validate(input_front_image_path, input_back_image_path
             if not intaglio_prints_present:
                 print("Intaglio prints not detected.")
 
+        print("\nStep 5: Displaying Processed Images")
+        show_image(cv2.cvtColor(input_front_image, cv2.COLOR_BGR2RGB), "Processed Front Image")
+        show_image(input_back_image, "Processed Back Image")
+        show_image(front_template, "Template Front Image")
+
         return best_match
     else:
         print("No accurate match found. Please try a clearer image.")
         return None
 
 # Example usage
-input_front_image_path = "uploaded_notes/front 100.jpg"
-input_back_image_path = "uploaded_notes/back 50.jpg"
+input_front_image_path = "uploaded_notes/front 20.jpg"
+input_back_image_path = "uploaded_notes/back 20.jpg"
 identify_currency_and_validate(input_front_image_path, input_back_image_path)
