@@ -3,6 +3,7 @@ import os
 import cv2
 import numpy as np
 from skimage.metrics import structural_similarity as ssim
+import threading
 
 # Set up paths and application configurations
 TEMPLATE_DIR = "currency_templates/"
@@ -83,23 +84,32 @@ def histogram_similarity(img1, img2):
 
 # Rotate Function
 def rotate_image(image):
-    # Get the dimensions of the image
     (h, w) = image.shape[:2]
-    
-    # Define the center of the image
     center = (w // 2, h // 2)
-    
-    # Create a rotation matrix for 180 degrees
     M = cv2.getRotationMatrix2D(center, 180, 1.0)
-    
-    # Apply the affine transformation
     rotated_image = cv2.warpAffine(image, M, (w, h))
-    
     return rotated_image
 
+def calculate_match_scores(input_front, input_back, templates, match_scores):
+    def process_template(currency, sides):
+        front_score = compare_images(cv2.cvtColor(input_front, cv2.COLOR_BGR2GRAY), sides['front'])
+        back_score = compare_images(input_back, sides['back'])
+        combined_score = (front_score + back_score) / 2
+        color_consistency = histogram_similarity(input_front, cv2.cvtColor(sides['front'], cv2.COLOR_GRAY2BGR))
+        final_score = 0.7 * combined_score + 0.3 * color_consistency
+        match_scores[currency] = final_score
+
+    threads = []
+    for currency, sides in templates.items():
+        thread = threading.Thread(target=process_template, args=(currency, sides))
+        threads.append(thread)
+        thread.start()
+
+    # Wait for all threads to finish
+    for thread in threads:
+        thread.join()
 
 def identify_and_validate_currency(input_front_image_path, input_back_image_path, similarity_threshold=0.75):
-    # Load and preprocess images
     input_front_image = cv2.imread(input_front_image_path, cv2.IMREAD_COLOR)
     input_back_image = cv2.imread(input_back_image_path, cv2.IMREAD_GRAYSCALE)
 
@@ -110,52 +120,35 @@ def identify_and_validate_currency(input_front_image_path, input_back_image_path
     if not templates:
         return "No templates found in the specified directory.", None
 
-    # Function to calculate match scores for the images against templates
-    def calculate_match_scores(input_front, input_back):
-        match_scores = {}
-        for currency, sides in templates.items():
-            front_score = compare_images(cv2.cvtColor(input_front, cv2.COLOR_BGR2GRAY), sides['front'])
-            back_score = compare_images(input_back, sides['back'])
-            combined_score = (front_score + back_score) / 2
-            color_consistency = histogram_similarity(input_front, cv2.cvtColor(sides['front'], cv2.COLOR_GRAY2BGR))
-            final_score = 0.7 * combined_score + 0.3 * color_consistency
-            match_scores[currency] = final_score
-        return match_scores
-
-    # Step 1: Try matching without rotation
-    match_scores = calculate_match_scores(input_front_image, input_back_image)
+    match_scores = {}
+    calculate_match_scores(input_front_image, input_back_image, templates, match_scores)
     best_match = max(match_scores, key=match_scores.get)
     best_score = match_scores[best_match]
 
-    # Step 2: If initial match is below the threshold, rotate and retry
     if best_score < similarity_threshold:
         rotated_front_image = rotate_image(input_front_image)
         rotated_back_image = rotate_image(input_back_image)
         
-        # Check match scores again with the rotated images
-        match_scores = calculate_match_scores(rotated_front_image, rotated_back_image)
+        match_scores = {}
+        calculate_match_scores(rotated_front_image, rotated_back_image, templates, match_scores)
         best_match_rotated = max(match_scores, key=match_scores.get)
         best_score_rotated = match_scores[best_match_rotated]
 
-        # If the rotated match is better, update the best match and use the rotated images
         if best_score_rotated > best_score:
             best_match = best_match_rotated
             best_score = best_score_rotated
-            input_front_image = rotated_front_image  # Use the rotated image for further processing
-            input_back_image = rotated_back_image      # Use the rotated image for further processing
+            input_front_image = rotated_front_image 
+            input_back_image = rotated_back_image
 
-    # Check if the best score meets the similarity threshold
     if best_score > similarity_threshold:
         front_template = templates[best_match]['front']
         
-        # Perform other validations with the best matched (potentially rotated) images
         watermark_detected = detect_watermark(cv2.cvtColor(input_front_image, cv2.COLOR_BGR2GRAY), front_template)
         micro_text_present = detect_microtext(cv2.cvtColor(input_front_image, cv2.COLOR_BGR2GRAY))
         see_through_present = detect_see_through(input_front_image)
         security_thread_present = detect_security_thread(input_front_image)
         intaglio_prints_present = detect_intaglio_prints(cv2.cvtColor(input_front_image, cv2.COLOR_BGR2GRAY))
 
-        # Calculate the feature score for authenticity
         feature_score = (
             0.25 * watermark_detected + 
             0.2 * micro_text_present +
@@ -182,7 +175,6 @@ def identify_and_validate_currency(input_front_image_path, input_back_image_path
         return best_match, authenticity_message
     else:
         return None, "No accurate match found. Please try a clearer image."
-
 
 # Flask route definitions
 @app.route('/')
@@ -218,6 +210,5 @@ def upload_file():
     return render_template('index.html', result=result, authenticity_message=authenticity_message)
 
 if __name__ == '__main__':
-    # Create upload folder if it doesn't exist
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     app.run(debug=True)
