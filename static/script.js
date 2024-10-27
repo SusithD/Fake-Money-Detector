@@ -51,11 +51,11 @@ function previewImage(event, previewId) {
         const reader = new FileReader();
         reader.onload = function(e) {
             preview.src = e.target.result;
-            preview.style.display = 'block'; // Show the preview
+            preview.style.display = 'block';
         };
         reader.readAsDataURL(input.files[0]);
     } else {
         preview.src = '';
-        preview.style.display = 'none'; // Hide the preview if no file is selected
+        preview.style.display = 'none';
     }
 }

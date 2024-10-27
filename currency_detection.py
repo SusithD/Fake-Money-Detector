@@ -26,7 +26,7 @@ def load_templates():
 def show_image(image, title='Image', cmap=None):
     plt.imshow(image, cmap=cmap)
     plt.title(title)
-    plt.axis('off')  # Hide axes
+    plt.axis('off') 
     plt.show()
 
 # Enhanced watermark detection
@@ -35,30 +35,30 @@ def detect_watermark(image, template_front):
     _, binary_image = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
     _, binary_template = cv2.threshold(front_resized, 127, 255, cv2.THRESH_BINARY)
     score, _ = ssim(binary_image, binary_template, full=True)
-    return score > 0.80  # Increased threshold for robustness
+    return score > 0.80  
 
 # Microtext detection with density check
 def detect_micro_text(image):
     blurred = cv2.GaussianBlur(image, (3, 3), 0)
     _, binary = cv2.threshold(blurred, 127, 255, cv2.THRESH_BINARY_INV)
     contours, _ = cv2.findContours(binary, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    microtext_count = sum(1 for cnt in contours if 50 < cv2.contourArea(cnt) < 100)  # Adjusted density range
-    return 100 < microtext_count < 5000  # Narrowed acceptable range for microtext density
+    microtext_count = sum(1 for cnt in contours if 50 < cv2.contourArea(cnt) < 100)  
+    return 100 < microtext_count < 5000  
 
 # See-Through Feature Detection
 def detect_see_through(image):
     flipped_image = cv2.flip(image, 1)
     score, _ = ssim(cv2.cvtColor(image, cv2.COLOR_BGR2GRAY), cv2.cvtColor(flipped_image, cv2.COLOR_BGR2GRAY), full=True)
-    return score < 0.90  # Higher score indicates misalignment or absence
+    return score < 0.90  
 
 # Security Thread Detection
 def detect_security_thread(image):
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-    mask_red = cv2.inRange(hsv, (0, 100, 100), (10, 255, 255))  # Detecting red
-    mask_green = cv2.inRange(hsv, (40, 100, 100), (80, 255, 255))  # Detecting green
+    mask_red = cv2.inRange(hsv, (0, 100, 100), (10, 255, 255))
+    mask_green = cv2.inRange(hsv, (40, 100, 100), (80, 255, 255))  
     combined_mask = cv2.bitwise_or(mask_red, mask_green)
     thread_intensity = np.sum(combined_mask) / 255
-    return thread_intensity > 5000  # Threshold for detecting the security thread
+    return thread_intensity > 5000  
 
 # Intaglio Prints Detection
 def detect_intaglio_prints(image):
@@ -66,8 +66,8 @@ def detect_intaglio_prints(image):
     laplacian_abs = cv2.convertScaleAbs(laplacian)
     _, binary = cv2.threshold(laplacian_abs, 30, 255, cv2.THRESH_BINARY)
     contours, _ = cv2.findContours(binary, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    intaglio_count = sum(1 for cnt in contours if cv2.contourArea(cnt) > 100)  # Adjust based on expected texture
-    return intaglio_count > 20  # Minimum count for detecting intaglio prints
+    intaglio_count = sum(1 for cnt in contours if cv2.contourArea(cnt) > 100) 
+    return intaglio_count > 20  
 
 # Template matching with histogram analysis for color consistency
 def compare_images(input_image, template_image):
