@@ -81,6 +81,23 @@ def histogram_similarity(img1, img2):
     hist_img2 = cv2.calcHist([img2], [0], None, [256], [0, 256])
     return cv2.compareHist(hist_img1, hist_img2, cv2.HISTCMP_CORREL)
 
+# Rotate Function
+def rotate_image(image):
+    # Get the dimensions of the image
+    (h, w) = image.shape[:2]
+    
+    # Define the center of the image
+    center = (w // 2, h // 2)
+    
+    # Create a rotation matrix for 180 degrees
+    M = cv2.getRotationMatrix2D(center, 180, 1.0)
+    
+    # Apply the affine transformation
+    rotated_image = cv2.warpAffine(image, M, (w, h))
+    
+    return rotated_image
+
+
 # Main function for currency identification and validation
 def identify_and_validate_currency(input_front_image_path, input_back_image_path, similarity_threshold=0.75):
     input_front_image = cv2.imread(input_front_image_path, cv2.IMREAD_COLOR)
@@ -93,18 +110,32 @@ def identify_and_validate_currency(input_front_image_path, input_back_image_path
     if not templates:
         return "No templates found in the specified directory.", None
 
-    match_scores = {}
-    for currency, sides in templates.items():
-        front_score = compare_images(cv2.cvtColor(input_front_image, cv2.COLOR_BGR2GRAY), sides['front'])
-        back_score = compare_images(input_back_image, sides['back'])
-        combined_score = (front_score + back_score) / 2
-        color_consistency = histogram_similarity(input_front_image, cv2.cvtColor(sides['front'], cv2.COLOR_GRAY2BGR))
-        final_score = 0.7 * combined_score + 0.3 * color_consistency
-        match_scores[currency] = final_score
+    # Function to calculate match scores for the images against templates
+    def calculate_match_scores(input_front, input_back):
+        match_scores = {}
+        for currency, sides in templates.items():
+            front_score = compare_images(cv2.cvtColor(input_front, cv2.COLOR_BGR2GRAY), sides['front'])
+            back_score = compare_images(input_back, sides['back'])
+            combined_score = (front_score + back_score) / 2
+            color_consistency = histogram_similarity(input_front, cv2.cvtColor(sides['front'], cv2.COLOR_GRAY2BGR))
+            final_score = 0.7 * combined_score + 0.3 * color_consistency
+            match_scores[currency] = final_score
+        return match_scores
 
+    # Step 1: Try matching without rotation
+    match_scores = calculate_match_scores(input_front_image, input_back_image)
     best_match = max(match_scores, key=match_scores.get)
     best_score = match_scores[best_match]
 
+    # Step 2: If initial match is below the threshold, rotate by 180 degrees and retry
+    if best_score < similarity_threshold:
+        rotated_front_image = rotate_image(input_front_image)
+        rotated_back_image = rotate_image(input_back_image)
+        match_scores = calculate_match_scores(rotated_front_image, rotated_back_image)
+        best_match = max(match_scores, key=match_scores.get)
+        best_score = match_scores[best_match]
+
+    # Step 3: Check if the best score meets the similarity threshold
     if best_score > similarity_threshold:
         front_template = templates[best_match]['front']
         watermark_detected = detect_watermark(cv2.cvtColor(input_front_image, cv2.COLOR_BGR2GRAY), front_template)
@@ -174,4 +205,6 @@ def upload_file():
     return render_template('index.html', result=result, authenticity_message=authenticity_message)
 
 if __name__ == '__main__':
+    # Create upload folder if it doesn't exist
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     app.run(debug=True)
