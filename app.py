@@ -109,6 +109,7 @@ def calculate_match_scores(input_front, input_back, templates, match_scores):
     for thread in threads:
         thread.join()
 
+# Updated `identify_and_validate_currency` function with additional threading
 def identify_and_validate_currency(input_front_image_path, input_back_image_path, similarity_threshold=0.75):
     input_front_image = cv2.imread(input_front_image_path, cv2.IMREAD_COLOR)
     input_back_image = cv2.imread(input_back_image_path, cv2.IMREAD_GRAYSCALE)
@@ -143,12 +144,48 @@ def identify_and_validate_currency(input_front_image_path, input_back_image_path
     if best_score > similarity_threshold:
         front_template = templates[best_match]['front']
         
-        watermark_detected = detect_watermark(cv2.cvtColor(input_front_image, cv2.COLOR_BGR2GRAY), front_template)
-        micro_text_present = detect_microtext(cv2.cvtColor(input_front_image, cv2.COLOR_BGR2GRAY))
-        see_through_present = detect_see_through(input_front_image)
-        security_thread_present = detect_security_thread(input_front_image)
-        intaglio_prints_present = detect_intaglio_prints(cv2.cvtColor(input_front_image, cv2.COLOR_BGR2GRAY))
+        # Threaded feature detection
+        results = {}
 
+        def detect_watermark_thread():
+            results['watermark_detected'] = detect_watermark(cv2.cvtColor(input_front_image, cv2.COLOR_BGR2GRAY), front_template)
+
+        def detect_microtext_thread():
+            results['micro_text_present'] = detect_microtext(cv2.cvtColor(input_front_image, cv2.COLOR_BGR2GRAY))
+
+        def detect_see_through_thread():
+            results['see_through_present'] = detect_see_through(input_front_image)
+
+        def detect_security_thread_thread():
+            results['security_thread_present'] = detect_security_thread(input_front_image)
+
+        def detect_intaglio_prints_thread():
+            results['intaglio_prints_present'] = detect_intaglio_prints(cv2.cvtColor(input_front_image, cv2.COLOR_BGR2GRAY))
+
+        threads = [
+            threading.Thread(target=detect_watermark_thread),
+            threading.Thread(target=detect_microtext_thread),
+            threading.Thread(target=detect_see_through_thread),
+            threading.Thread(target=detect_security_thread_thread),
+            threading.Thread(target=detect_intaglio_prints_thread)
+        ]
+
+        # Start all threads
+        for thread in threads:
+            thread.start()
+
+        # Wait for all threads to complete
+        for thread in threads:
+            thread.join()
+
+        # Gather feature detection results
+        watermark_detected = results['watermark_detected']
+        micro_text_present = results['micro_text_present']
+        see_through_present = results['see_through_present']
+        security_thread_present = results['security_thread_present']
+        intaglio_prints_present = results['intaglio_prints_present']
+
+        # Calculate the feature score for authenticity
         feature_score = (
             0.25 * watermark_detected + 
             0.2 * micro_text_present +
