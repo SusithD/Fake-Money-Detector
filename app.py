@@ -98,8 +98,8 @@ def rotate_image(image):
     return rotated_image
 
 
-# Main function for currency identification and validation
 def identify_and_validate_currency(input_front_image_path, input_back_image_path, similarity_threshold=0.75):
+    # Load and preprocess images
     input_front_image = cv2.imread(input_front_image_path, cv2.IMREAD_COLOR)
     input_back_image = cv2.imread(input_back_image_path, cv2.IMREAD_GRAYSCALE)
 
@@ -127,23 +127,35 @@ def identify_and_validate_currency(input_front_image_path, input_back_image_path
     best_match = max(match_scores, key=match_scores.get)
     best_score = match_scores[best_match]
 
-    # Step 2: If initial match is below the threshold, rotate by 180 degrees and retry
+    # Step 2: If initial match is below the threshold, rotate and retry
     if best_score < similarity_threshold:
         rotated_front_image = rotate_image(input_front_image)
         rotated_back_image = rotate_image(input_back_image)
+        
+        # Check match scores again with the rotated images
         match_scores = calculate_match_scores(rotated_front_image, rotated_back_image)
-        best_match = max(match_scores, key=match_scores.get)
-        best_score = match_scores[best_match]
+        best_match_rotated = max(match_scores, key=match_scores.get)
+        best_score_rotated = match_scores[best_match_rotated]
 
-    # Step 3: Check if the best score meets the similarity threshold
+        # If the rotated match is better, update the best match and use the rotated images
+        if best_score_rotated > best_score:
+            best_match = best_match_rotated
+            best_score = best_score_rotated
+            input_front_image = rotated_front_image  # Use the rotated image for further processing
+            input_back_image = rotated_back_image      # Use the rotated image for further processing
+
+    # Check if the best score meets the similarity threshold
     if best_score > similarity_threshold:
         front_template = templates[best_match]['front']
+        
+        # Perform other validations with the best matched (potentially rotated) images
         watermark_detected = detect_watermark(cv2.cvtColor(input_front_image, cv2.COLOR_BGR2GRAY), front_template)
         micro_text_present = detect_microtext(cv2.cvtColor(input_front_image, cv2.COLOR_BGR2GRAY))
         see_through_present = detect_see_through(input_front_image)
         security_thread_present = detect_security_thread(input_front_image)
         intaglio_prints_present = detect_intaglio_prints(cv2.cvtColor(input_front_image, cv2.COLOR_BGR2GRAY))
 
+        # Calculate the feature score for authenticity
         feature_score = (
             0.25 * watermark_detected + 
             0.2 * micro_text_present +
@@ -170,6 +182,7 @@ def identify_and_validate_currency(input_front_image_path, input_back_image_path
         return best_match, authenticity_message
     else:
         return None, "No accurate match found. Please try a clearer image."
+
 
 # Flask route definitions
 @app.route('/')
