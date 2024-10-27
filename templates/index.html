@@ -20,18 +20,26 @@
         <section class="container">
             <h2>Upload Currency Images</h2>
             <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" id="uploadForm">
-                <div class="form-group">
+                <!-- Drag-and-drop area for front image -->
+                <div class="form-group" id="frontImageDropZone">
                     <label for="front">Upload Front Image:</label>
-                    <input type="file" name="front" accept="image/*" required id="front">
+                    <input type="file" name="front" accept="image/*" required id="front" class="file-input">
+                    <p class="drag-text">Drag & Drop or Click to Upload Front Image</p>
+                    <img id="frontPreview" class="preview-image" alt="Front Image Preview" style="display: none;">
                 </div>
-                <div class="form-group">
+                
+                <!-- Drag-and-drop area for back image -->
+                <div class="form-group" id="backImageDropZone">
                     <label for="back">Upload Back Image:</label>
-                    <input type="file" name="back" accept="image/*" required id="back">
+                    <input type="file" name="back" accept="image/*" required id="back" class="file-input">
+                    <p class="drag-text">Drag & Drop or Click to Upload Back Image</p>
+                    <img id="backPreview" class="preview-image" alt="Back Image Preview" style="display: none;">
                 </div>
+                
                 <button type="submit">Check Currency</button>
                 <p id="errorMessage" class="error-message" aria-live="polite"></p>
             </form>
-
+            
             {% if result %}
             <div class="result">
                 <h2>Result:</h2>
@@ -43,22 +51,6 @@
                 <p>{{ authenticity_message }}</p>
             </div>
             {% endif %}
-        </section>
-
-        <section class="features">
-            <h2>Main Features</h2>
-            <div class="feature-item">
-                <h3>Accurate Detection</h3>
-                <p>Our AI-based system provides high accuracy in detecting currency authenticity.</p>
-            </div>
-            <div class="feature-item">
-                <h3>Fast Processing</h3>
-                <p>Get results in seconds after uploading your currency images.</p>
-            </div>
-            <div class="feature-item">
-                <h3>Easy to Use</h3>
-                <p>Simple interface with intuitive design for effortless currency verification.</p>
-            </div>
         </section>
 
         <section class="technologies">
