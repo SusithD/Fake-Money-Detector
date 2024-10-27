@@ -8,32 +8,58 @@
     <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 </head>
 <body>
-    <div class="container">
-        <h1>Currency Detection</h1>
-        <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" id="uploadForm">
-            <div class="form-group">
-                <label for="front">Upload Front Image:</label>
-                <input type="file" name="front" accept="image/*" required id="front">
-            </div>
-            <div class="form-group">
-                <label for="back">Upload Back Image:</label>
-                <input type="file" name="back" accept="image/*" required id="back">
-            </div>
-            <button type="submit">Check Currency</button>
-            <p id="errorMessage" class="error-message"></p>
-        </form>
+    <header class="hero-section">
+        <div class="hero-content">
+            <h1>Currency Detection</h1>
+            <p>Upload images of currency bills to detect authenticity and determine currency type</p>
+            <a href="#uploadSection" class="hero-button">Get Started</a>
+        </div>
+    </header>
 
-        {% if result %}
-        <div class="result">
-            <h2>Result:</h2>
-            <p>Detected Currency: <strong>{{ result }}</strong></p>
-            <p>{{ authenticity_message }}</p>
-        </div>
-        {% elif authenticity_message %}
-        <div class="error">
-            <p>{{ authenticity_message }}</p>
-        </div>
-        {% endif %}
-    </div>
+    <main id="uploadSection" class="main-content">
+        <section class="container">
+            <h2>Upload Currency Images</h2>
+            <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" id="uploadForm">
+                <div class="form-group">
+                    <label for="front">Upload Front Image:</label>
+                    <input type="file" name="front" accept="image/*" required id="front">
+                </div>
+                <div class="form-group">
+                    <label for="back">Upload Back Image:</label>
+                    <input type="file" name="back" accept="image/*" required id="back">
+                </div>
+                <button type="submit">Check Currency</button>
+                <p id="errorMessage" class="error-message"></p>
+            </form>
+
+            {% if result %}
+            <div class="result">
+                <h2>Result:</h2>
+                <p>Detected Currency: <strong>{{ result }}</strong></p>
+                <p>{{ authenticity_message }}</p>
+            </div>
+            {% elif authenticity_message %}
+            <div class="error">
+                <p>{{ authenticity_message }}</p>
+            </div>
+            {% endif %}
+        </section>
+
+        <section class="features">
+            <h2>Main Features</h2>
+            <div class="feature-item">
+                <h3>Accurate Detection</h3>
+                <p>Our AI-based system provides high accuracy in detecting currency authenticity.</p>
+            </div>
+            <div class="feature-item">
+                <h3>Fast Processing</h3>
+                <p>Get results in seconds after uploading your currency images.</p>
+            </div>
+            <div class="feature-item">
+                <h3>Easy to Use</h3>
+                <p>Simple interface with intuitive design for effortless currency verification.</p>
+            </div>
+        </section>
+    </main>
 </body>
 </html>

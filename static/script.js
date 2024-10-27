@@ -3,13 +3,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const frontInput = document.getElementById('front');
     const backInput = document.getElementById('back');
     const errorMessage = document.getElementById('errorMessage');
+    const heroButton = document.querySelector('.hero-button');
 
     function validateFileType(fileInput) {
         const file = fileInput.files[0];
-        if (file && !file.type.startsWith('image/')) {
-            return false;
-        }
-        return true;
+        return file && file.type.startsWith('image/');
     }
 
     function displayError(message) {
@@ -30,5 +28,10 @@ document.addEventListener('DOMContentLoaded', () => {
             displayError('Only image files are allowed.');
             event.preventDefault();
         }
+    });
+
+    heroButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        document.querySelector(heroButton.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
     });
 });
