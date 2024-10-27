@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const frontInput = document.getElementById('front');
     const backInput = document.getElementById('back');
     const errorMessage = document.getElementById('errorMessage');
+    const loadingSpinner = document.getElementById('loadingSpinner');
 
     function validateFileType(fileInput) {
         const file = fileInput.files[0];
@@ -29,10 +30,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!validateFileType(frontInput) || !validateFileType(backInput)) {
             displayError('Only image files are allowed.');
             event.preventDefault();
+            return;
         }
+        
+        // Show loading spinner and proceed with form submission
+        loadingSpinner.style.display = 'flex';
+    });
+
+    // Hide spinner when page loads (if returning to this page with form data)
+    window.addEventListener('load', () => {
+        loadingSpinner.style.display = 'none';
     });
 });
-
 
 function previewImage(event, previewId) {
     const input = event.target;
