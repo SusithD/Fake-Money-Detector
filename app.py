@@ -4,17 +4,15 @@ import cv2
 import numpy as np
 from skimage.metrics import structural_similarity as ssim
 
-# Path to the template directory for currency images
+# Set up paths and application configurations
 TEMPLATE_DIR = "currency_templates/"
-
-# Initialize Flask application
+UPLOAD_FOLDER = 'uploaded_notes/'
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
-UPLOAD_FOLDER = 'uploaded_notes/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Load template images for currency validation
-def load_templates():
+# Load currency templates for validation
+def load_currency_templates():
     templates = {}
     for currency in os.listdir(TEMPLATE_DIR):
         currency_path = os.path.join(TEMPLATE_DIR, currency)
@@ -30,54 +28,52 @@ def load_templates():
                 print(f"Warning: Missing image files for currency: {currency}")
     return templates
 
-# Compare two images for similarity
+# Calculate similarity score between two images
 def compare_images(input_image, template_image):
     if input_image.shape != template_image.shape:
-        template_resized = cv2.resize(template_image, input_image.shape[::-1])
-    else:
-        template_resized = template_image
-    score, _ = ssim(input_image, template_resized, full=True)
+        template_image = cv2.resize(template_image, input_image.shape[::-1])
+    score, _ = ssim(input_image, template_image, full=True)
     return score
 
-# Enhanced watermark detection
+# Watermark detection with a specified threshold
 def detect_watermark(image, template_front):
     front_resized = cv2.resize(template_front, (image.shape[1], image.shape[0]))
     _, binary_image = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
     _, binary_template = cv2.threshold(front_resized, 127, 255, cv2.THRESH_BINARY)
     score, _ = ssim(binary_image, binary_template, full=True)
-    return score > 0.80  # Increased threshold for robustness
+    return score > 0.80  # Threshold for watermark detection
 
-# Microtext detection with density check
-def detect_micro_text(image):
+# Microtext detection with density constraints
+def detect_microtext(image):
     blurred = cv2.GaussianBlur(image, (3, 3), 0)
     _, binary = cv2.threshold(blurred, 127, 255, cv2.THRESH_BINARY_INV)
     contours, _ = cv2.findContours(binary, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    microtext_count = sum(1 for cnt in contours if 50 < cv2.contourArea(cnt) < 100)  # Adjusted density range
-    return 100 < microtext_count < 5000  # Narrowed acceptable range for microtext density
+    microtext_count = sum(1 for cnt in contours if 50 < cv2.contourArea(cnt) < 100)
+    return 100 < microtext_count < 5000
 
-# See-Through Feature Detection
+# See-through feature detection
 def detect_see_through(image):
     flipped_image = cv2.flip(image, 1)
     score, _ = ssim(cv2.cvtColor(image, cv2.COLOR_BGR2GRAY), cv2.cvtColor(flipped_image, cv2.COLOR_BGR2GRAY), full=True)
-    return score < 0.90  # Higher score indicates misalignment or absence
+    return score < 0.90
 
-# Security Thread Detection
+# Security thread detection based on color consistency
 def detect_security_thread(image):
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-    mask_red = cv2.inRange(hsv, (0, 100, 100), (10, 255, 255))  # Detecting red
-    mask_green = cv2.inRange(hsv, (40, 100, 100), (80, 255, 255))  # Detecting green
+    mask_red = cv2.inRange(hsv, (0, 100, 100), (10, 255, 255))
+    mask_green = cv2.inRange(hsv, (40, 100, 100), (80, 255, 255))
     combined_mask = cv2.bitwise_or(mask_red, mask_green)
     thread_intensity = np.sum(combined_mask) / 255
-    return thread_intensity > 5000  # Threshold for detecting the security thread
+    return thread_intensity > 5000
 
-# Intaglio Prints Detection
+# Intaglio print detection based on texture
 def detect_intaglio_prints(image):
     laplacian = cv2.Laplacian(image, cv2.CV_64F)
     laplacian_abs = cv2.convertScaleAbs(laplacian)
     _, binary = cv2.threshold(laplacian_abs, 30, 255, cv2.THRESH_BINARY)
     contours, _ = cv2.findContours(binary, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    intaglio_count = sum(1 for cnt in contours if cv2.contourArea(cnt) > 100)  # Adjust based on expected texture
-    return intaglio_count > 20  # Minimum count for detecting intaglio prints
+    intaglio_count = sum(1 for cnt in contours if cv2.contourArea(cnt) > 100)
+    return intaglio_count > 20
 
 # Histogram comparison for color consistency
 def histogram_similarity(img1, img2):
@@ -86,16 +82,16 @@ def histogram_similarity(img1, img2):
     return cv2.compareHist(hist_img1, hist_img2, cv2.HISTCMP_CORREL)
 
 # Main function for currency identification and validation
-def identify_currency_and_validate(input_front_image_path, input_back_image_path, similarity_threshold=0.75):
+def identify_and_validate_currency(input_front_image_path, input_back_image_path, similarity_threshold=0.75):
     input_front_image = cv2.imread(input_front_image_path, cv2.IMREAD_COLOR)
     input_back_image = cv2.imread(input_back_image_path, cv2.IMREAD_GRAYSCALE)
 
     if input_front_image is None or input_back_image is None:
-        return "Error: Could not load one or both input images.", None
+        return "Error: Could not load one or both input images.", None, {}
 
-    templates = load_templates()
+    templates = load_currency_templates()
     if not templates:
-        return "No templates found in the specified directory.", None
+        return "No templates found in the specified directory.", None, {}
 
     match_scores = {}
     for currency, sides in templates.items():
@@ -112,10 +108,19 @@ def identify_currency_and_validate(input_front_image_path, input_back_image_path
     if best_score > similarity_threshold:
         front_template = templates[best_match]['front']
         watermark_detected = detect_watermark(cv2.cvtColor(input_front_image, cv2.COLOR_BGR2GRAY), front_template)
-        micro_text_present = detect_micro_text(cv2.cvtColor(input_front_image, cv2.COLOR_BGR2GRAY))
+        micro_text_present = detect_microtext(cv2.cvtColor(input_front_image, cv2.COLOR_BGR2GRAY))
         see_through_present = detect_see_through(input_front_image)
         security_thread_present = detect_security_thread(input_front_image)
         intaglio_prints_present = detect_intaglio_prints(cv2.cvtColor(input_front_image, cv2.COLOR_BGR2GRAY))
+
+        # Create a detailed report of feature detections
+        feature_detections = {
+            'Watermark Detected': watermark_detected,
+            'Microtext Present': micro_text_present,
+            'See-through Feature Detected': see_through_present,
+            'Security Thread Detected': security_thread_present,
+            'Intaglio Prints Detected': intaglio_prints_present,
+        }
 
         feature_score = (
             0.25 * watermark_detected + 
@@ -129,22 +134,17 @@ def identify_currency_and_validate(input_front_image_path, input_back_image_path
             authenticity_message = "The note is likely authentic."
         else:
             authenticity_message = "Warning: This note may be counterfeit."
-            if not watermark_detected:
-                authenticity_message += " Watermark not detected."
-            if not micro_text_present:
-                authenticity_message += " Micro-text not detected."
-            if not see_through_present:
-                authenticity_message += " See-through feature not detected."
-            if not security_thread_present:
-                authenticity_message += " Security thread not detected."
-            if not intaglio_prints_present:
-                authenticity_message += " Intaglio prints not detected."
 
-        return best_match, authenticity_message
+        # Include specific feedback on which features were not detected
+        for feature, detected in feature_detections.items():
+            if not detected:
+                authenticity_message += f" {feature} not detected."
+
+        return best_match, authenticity_message, feature_detections
     else:
-        return None, "No accurate match found. Please try a clearer image."
+        return None, "No accurate match found. Please try a clearer image.", {}
 
-
+# Flask route definitions
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -173,10 +173,9 @@ def upload_file():
     front_image.save(front_path)
     back_image.save(back_path)
 
-    result, authenticity_message = identify_currency_and_validate(front_path, back_path)
+    result, authenticity_message, feature_detections = identify_and_validate_currency(front_path, back_path)
 
-    # Pass result and authenticity_message to the template for display
-    return render_template('index.html', result=result, authenticity_message=authenticity_message)
+    return render_template('index.html', result=result, authenticity_message=authenticity_message, feature_detections=feature_detections)
 
 if __name__ == '__main__':
     app.run(debug=True)

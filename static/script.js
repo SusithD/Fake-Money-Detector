@@ -17,13 +17,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     form.addEventListener('submit', (event) => {
         errorMessage.style.display = 'none';
-        
+
         if (!frontInput.files.length || !backInput.files.length) {
             displayError('Please upload both front and back images.');
             event.preventDefault();
             return;
         }
-        
+
         if (!validateFileType(frontInput) || !validateFileType(backInput)) {
             displayError('Only image files are allowed.');
             event.preventDefault();
