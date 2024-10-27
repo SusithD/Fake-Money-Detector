@@ -41,7 +41,7 @@ body {
     padding: 10px 20px;
     font-size: 1rem;
     color: #fff;
-    background-color: #2c2c2c;
+    background-color: #0246f2;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -50,7 +50,7 @@ body {
 }
 
 .hero-button:hover {
-    background-color: #fd0000;
+    background-color: #0235b6;
 }
 
 .main-content {
@@ -91,7 +91,7 @@ input[type="file"] {
 }
 
 button {
-    background-color: #4CAF50;
+    background-color: #0246f2;
     color: #fff;
     padding: 10px 20px;
     border: none;
@@ -102,7 +102,7 @@ button {
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color: #0235b6;
 }
 
 .result, .error {
@@ -112,8 +112,8 @@ button:hover {
 }
 
 .result {
-    background-color: #e8f5e9;
-    color: #388e3c;
+    background-color: #e7e7e7;
+    color: #313131;
 }
 
 .error {
@@ -134,7 +134,7 @@ button:hover {
 }
 
 .features h2 {
-    color: #4CAF50;
+    color: #222222;
     margin-bottom: 20px;
 }
 
@@ -149,4 +149,131 @@ button:hover {
 
 .feature-item p {
     color: #555;
+}
+
+/* New styles for Technologies Used section */
+.technologies {
+    margin-top: 40px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+.technologies h2 {
+    color: #222222;
+    margin-bottom: 20px;
+}
+
+.technologies ul {
+    list-style-type: disc;
+    margin-left: 20px;
+}
+
+/* New styles for Digital Image Processing Methods section */
+.image-processing {
+    margin-top: 40px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+.image-processing h2 {
+    color: #222222;
+    margin-bottom: 20px;
+}
+
+.image-processing ul {
+    list-style-type: disc;
+    margin-left: 20px;
+}
+
+/* New styles for Process Flow section */
+.process-flow {
+    margin-top: 40px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+.process-flow h2 {
+    color: #222222;
+    margin-bottom: 20px;
+}
+
+.flow-chart {
+    display: flex;
+    flex-direction: column;
+}
+
+.step {
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 15px;
+    margin: 10px 0;
+}
+
+.step h3 {
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.step p {
+    color: #555;
+}
+
+/* New styles for Digital Image Processing Methods section */
+.image-processing {
+    margin-top: 40px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+.image-processing h2 {
+    color: #222222;
+    margin-bottom: 20px;
+}
+
+.panel-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* Adds space between the panels */
+}
+
+.panel {
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    flex: 1 1 calc(33% - 20px); /* Responsive layout: 3 panels per row */
+    min-width: 250px; /* Ensures panels have a minimum width */
+    transition: transform 0.3s;
+}
+
+.panel:hover {
+    transform: translateY(-5px); /* Lift effect on hover */
+}
+
+.panel h3 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.panel p, .panel ul {
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.panel ul {
+    list-style-type: disc;
+    margin-left: 20px;
 }

@@ -60,6 +60,78 @@
                 <p>Simple interface with intuitive design for effortless currency verification.</p>
             </div>
         </section>
+
+        <section class="technologies">
+            <h2>Technologies Used</h2>
+            <ul>
+                <li><strong>Flask:</strong> Web framework for building the application.</li>
+                <li><strong>OpenCV:</strong> Computer vision library for image processing.</li>
+                <li><strong>NumPy:</strong> Library for numerical operations on images.</li>
+            </ul>
+        </section>
+
+        <!-- New Section: Digital Image Processing Methods -->
+        <section class="image-processing">
+            <h2>Digital Image Processing Methods</h2>
+            <div class="panel-container">
+                <div class="panel">
+                    <h3>Image Acquisition</h3>
+                    <p>Capture currency images using digital cameras or scanners. This step ensures high-resolution images for analysis.</p>
+                </div>
+                <div class="panel">
+                    <h3>Image Preprocessing</h3>
+                    <p>Images are preprocessed to enhance their quality. This includes:</p>
+                    <ul>
+                        <li><strong>Grayscale Conversion:</strong> Simplifies processing by converting to grayscale.</li>
+                        <li><strong>Resizing:</strong> Ensures consistency across images during analysis.</li>
+                        <li><strong>Noise Reduction:</strong> Enhances features relevant to currency detection.</li>
+                    </ul>
+                </div>
+                <div class="panel">
+                    <h3>Feature Detection</h3>
+                    <p>Key features of currency are detected using techniques such as:</p>
+                    <ul>
+                        <li><strong>Edge Detection:</strong> Identifies edges crucial for recognizing patterns.</li>
+                        <li><strong>Template Matching:</strong> Compares features with predefined templates.</li>
+                        <li><strong>Contour Detection:</strong> Identifies shapes and outlines of specific features.</li>
+                    </ul>
+                </div>
+                <div class="panel">
+                    <h3>Similarity Comparison</h3>
+                    <p>The processed images are compared to a database of authentic currency images to determine similarity.</p>
+                </div>
+                <div class="panel">
+                    <h3>Result Generation</h3>
+                    <p>The system generates results based on the analysis, indicating the type of currency detected and authenticity.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="process-flow">
+            <h2>Process Flow</h2>
+            <div class="flow-chart">
+                <div class="step">
+                    <h3>Step 1: Image Upload</h3>
+                    <p>User uploads front and back images of the currency.</p>
+                </div>
+                <div class="step">
+                    <h3>Step 2: Image Preprocessing</h3>
+                    <p>Images are converted to grayscale and resized for analysis.</p>
+                </div>
+                <div class="step">
+                    <h3>Step 3: Feature Detection</h3>
+                    <p>Key features like watermark, microtext, and security threads are detected.</p>
+                </div>
+                <div class="step">
+                    <h3>Step 4: Similarity Comparison</h3>
+                    <p>Uploaded images are compared with predefined templates.</p>
+                </div>
+                <div class="step">
+                    <h3>Step 5: Result Generation</h3>
+                    <p>The system provides a result indicating currency type and authenticity.</p>
+                </div>
+            </div>
+        </section>
     </main>
 </body>
 </html>
