@@ -78,6 +78,15 @@ body {
     text-align: left;
 }
 
+.image-preview {
+    display: block;
+    margin-top: 10px;
+    max-width: 100%;
+    max-height: 200px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
 label {
     font-weight: bold;
     color: #333;
@@ -251,16 +260,18 @@ button:hover {
 
 .panel {
     background-color: #f9f9f9;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ccc;
+    border-radius: 4px;
     padding: 15px;
     flex: 1 1 calc(33% - 20px); /* Responsive layout: 3 panels per row */
     min-width: 250px; /* Ensures panels have a minimum width */
     transition: transform 0.3s;
+    margin: 10px 0;
+
 }
 
 .panel:hover {
-    transform: translateY(-5px); /* Lift effect on hover */
+    transform: translateY(-2px); /* Lift effect on hover */
 }
 
 .panel h3 {
