@@ -20,26 +20,18 @@
         <section class="container">
             <h2>Upload Currency Images</h2>
             <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" id="uploadForm">
-                <!-- Drag-and-drop area for front image -->
-                <div class="form-group" id="frontImageDropZone">
+                <div class="form-group">
                     <label for="front">Upload Front Image:</label>
-                    <input type="file" name="front" accept="image/*" required id="front" class="file-input">
-                    <p class="drag-text">Drag & Drop or Click to Upload Front Image</p>
-                    <img id="frontPreview" class="preview-image" alt="Front Image Preview" style="display: none;">
+                    <input type="file" name="front" accept="image/*" required id="front">
                 </div>
-                
-                <!-- Drag-and-drop area for back image -->
-                <div class="form-group" id="backImageDropZone">
+                <div class="form-group">
                     <label for="back">Upload Back Image:</label>
-                    <input type="file" name="back" accept="image/*" required id="back" class="file-input">
-                    <p class="drag-text">Drag & Drop or Click to Upload Back Image</p>
-                    <img id="backPreview" class="preview-image" alt="Back Image Preview" style="display: none;">
+                    <input type="file" name="back" accept="image/*" required id="back">
                 </div>
-                
                 <button type="submit">Check Currency</button>
                 <p id="errorMessage" class="error-message" aria-live="polite"></p>
             </form>
-            
+
             {% if result %}
             <div class="result">
                 <h2>Result:</h2>
