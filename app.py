@@ -87,11 +87,11 @@ def identify_and_validate_currency(input_front_image_path, input_back_image_path
     input_back_image = cv2.imread(input_back_image_path, cv2.IMREAD_GRAYSCALE)
 
     if input_front_image is None or input_back_image is None:
-        return "Error: Could not load one or both input images.", None, {}
+        return "Error: Could not load one or both input images.", None
 
     templates = load_currency_templates()
     if not templates:
-        return "No templates found in the specified directory.", None, {}
+        return "No templates found in the specified directory.", None
 
     match_scores = {}
     for currency, sides in templates.items():
@@ -113,15 +113,6 @@ def identify_and_validate_currency(input_front_image_path, input_back_image_path
         security_thread_present = detect_security_thread(input_front_image)
         intaglio_prints_present = detect_intaglio_prints(cv2.cvtColor(input_front_image, cv2.COLOR_BGR2GRAY))
 
-        # Create a detailed report of feature detections
-        feature_detections = {
-            'Watermark Detected': watermark_detected,
-            'Microtext Present': micro_text_present,
-            'See-through Feature Detected': see_through_present,
-            'Security Thread Detected': security_thread_present,
-            'Intaglio Prints Detected': intaglio_prints_present,
-        }
-
         feature_score = (
             0.25 * watermark_detected + 
             0.2 * micro_text_present +
@@ -134,15 +125,20 @@ def identify_and_validate_currency(input_front_image_path, input_back_image_path
             authenticity_message = "The note is likely authentic."
         else:
             authenticity_message = "Warning: This note may be counterfeit."
+            if not watermark_detected:
+                authenticity_message += " Watermark not detected."
+            if not micro_text_present:
+                authenticity_message += " Micro-text not detected."
+            if not see_through_present:
+                authenticity_message += " See-through feature not detected."
+            if not security_thread_present:
+                authenticity_message += " Security thread not detected."
+            if not intaglio_prints_present:
+                authenticity_message += " Intaglio prints not detected."
 
-        # Include specific feedback on which features were not detected
-        for feature, detected in feature_detections.items():
-            if not detected:
-                authenticity_message += f" {feature} not detected."
-
-        return best_match, authenticity_message, feature_detections
+        return best_match, authenticity_message
     else:
-        return None, "No accurate match found. Please try a clearer image.", {}
+        return None, "No accurate match found. Please try a clearer image."
 
 # Flask route definitions
 @app.route('/')
@@ -173,9 +169,9 @@ def upload_file():
     front_image.save(front_path)
     back_image.save(back_path)
 
-    result, authenticity_message, feature_detections = identify_and_validate_currency(front_path, back_path)
+    result, authenticity_message = identify_and_validate_currency(front_path, back_path)
 
-    return render_template('index.html', result=result, authenticity_message=authenticity_message, feature_detections=feature_detections)
+    return render_template('index.html', result=result, authenticity_message=authenticity_message)
 
 if __name__ == '__main__':
     app.run(debug=True)

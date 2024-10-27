@@ -37,15 +37,6 @@
                 <h2>Result:</h2>
                 <p>Detected Currency: <strong>{{ result }}</strong></p>
                 <p>{{ authenticity_message }}</p>
-
-                <h3>Feature Detection Summary:</h3>
-                <ul>
-                    <li>Watermark Detected: <strong>{{ 'Yes' if watermark_detected else 'No' }}</strong></li>
-                    <li>Microtext Present: <strong>{{ 'Yes' if microtext_present else 'No' }}</strong></li>
-                    <li>See-Through Feature: <strong>{{ 'Yes' if see_through_present else 'No' }}</strong></li>
-                    <li>Security Thread Detected: <strong>{{ 'Yes' if security_thread_present else 'No' }}</strong></li>
-                    <li>Intaglio Prints Detected: <strong>{{ 'Yes' if intaglio_prints_present else 'No' }}</strong></li>
-                </ul>
             </div>
             {% elif authenticity_message %}
             <div class="error">
