@@ -3,16 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <title>Result</title>
+    <title>Currency Details</title>
 </head>
 <body>
-    <h1>Currency Identification Result</h1>
-    <p>{{ message }}</p>
-    <p>Identified Currency: {{ currency }}</p>
-    {% if comparison_chart %}
-        <img src="{{ comparison_chart }}" alt="Comparison Chart">
-    {% endif %}
-    <a href="/">Back to Home</a>
+    <h1>Extracted Currency Details</h1>
+    <pre>{{ currency_details }}</pre>
+    <a href="/">Upload another image</a>
 </body>
 </html>

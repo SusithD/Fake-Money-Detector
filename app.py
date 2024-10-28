@@ -5,6 +5,9 @@ import numpy as np
 from skimage.metrics import structural_similarity as ssim
 import threading
 
+
+
+
 # Set up paths and application configurations
 TEMPLATE_DIR = "currency_templates/"
 UPLOAD_FOLDER = 'uploaded_notes/'
@@ -108,6 +111,21 @@ def calculate_match_scores(input_front, input_back, templates, match_scores):
     # Wait for all threads to finish
     for thread in threads:
         thread.join()
+
+def get_image_description(image_path):
+    # Open the image file
+    with open(image_path, "rb") as image_file:
+        # Call the Vision model to get the description
+        response = openai.Image.create(
+            file=image_file,
+            purpose="description"
+        )
+
+    # Extract the description from the response
+    description = response['data'][0]['description']
+    
+    return description
+
 
 # Updated `identify_and_validate_currency` function with additional threading
 def identify_and_validate_currency(input_front_image_path, input_back_image_path, similarity_threshold=0.75):
@@ -242,9 +260,19 @@ def upload_file():
     front_image.save(front_path)
     back_image.save(back_path)
 
+    # Use Vision AI to get descriptions for both images
+    front_description = get_image_description(front_path)
+    back_description = get_image_description(back_path)
+
     result, authenticity_message = identify_and_validate_currency(front_path, back_path)
 
-    return render_template('index.html', result=result, authenticity_message=authenticity_message)
+    return render_template(
+        'index.html',
+        result=result,
+        authenticity_message=authenticity_message,
+        front_description=front_description,
+        back_description=back_description
+    )
 
 if __name__ == '__main__':
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
