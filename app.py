@@ -29,28 +29,33 @@ model.to(device)
 model.config.pad_token_id = model.config.eos_token_id
 
 # Generation parameters
-max_length = 20
 num_beams = 7
-temperature = 0.9
+temperature = 0.5
 top_k = 50
 gen_kwargs = {
-    "max_length": max_length,
     "num_beams": num_beams,
     "temperature": temperature,
     "top_k": top_k
 }
 
-# Function to generate image description
 def get_image_description(image_path):
     image = Image.open(image_path)
     if image.mode != "RGB":
         image = image.convert(mode="RGB")
-    
+
     pixel_values = feature_extractor(images=[image], return_tensors="pt").pixel_values.to(device)
-    output_ids = model.generate(pixel_values, **gen_kwargs)
+
+    # Create a more detailed prompt for the model
+    prompt = (
+        "If you find 500 value on left side down corner or right side upper corner of the input image then front_description should be based on the value of the currency note: "
+    )
+    
+    # Generate the description with the prompt
+    output_ids = model.generate(pixel_values, **gen_kwargs, do_sample=True, max_length=150)
     
     description = tokenizer.decode(output_ids[0], skip_special_tokens=True)
     return description.strip()
+
 
 # Load currency templates for validation
 def load_currency_templates():
