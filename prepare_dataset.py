@@ -1,51 +1,29 @@
-import json
-import torch
 import os
+import json
 from PIL import Image
-from transformers import ViTImageProcessor, AutoTokenizer
-from datasets import Dataset
+from torch.utils.data import Dataset
 
-# Initialize processor and tokenizer
-processor = ViTImageProcessor.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
-tokenizer = AutoTokenizer.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
+class CurrencyDataset(Dataset):
+    def __init__(self, annotations_file, images_dir, transform=None):
+        with open(annotations_file, 'r') as f:
+            self.annotations = json.load(f)['annotations']
+        self.images_dir = images_dir
+        self.transform = transform
 
-# Load dataset
-def load_data():
-    with open("dataset/annotations.json", "r") as f:
-        data = json.load(f)
-    if "annotations" in data:
-        return data["annotations"]
-    else:
-        raise ValueError("Key 'annotations' not found in JSON")
+    def __len__(self):
+        return len(self.annotations)
 
-# Preprocess function
-def preprocess(example):
-    image_path = os.path.join("dataset", "images", example["image_id"])
-    try:
-        image = Image.open(image_path).convert("RGB")
-    except Exception as e:
-        print(f"Error opening image {image_path}: {e}")
-        return None
+    def __getitem__(self, idx):
+        img_name = os.path.join(self.images_dir, self.annotations[idx]['image_id'])
+        image = Image.open(img_name)
+        caption = self.annotations[idx]['caption']
+        
+        if self.transform:
+            image = self.transform(image)
 
-    # Process the image and remove the extra batch dimension
-    pixel_values = processor(images=image, return_tensors="pt").pixel_values.squeeze(0)
+        return image, caption
 
-    if pixel_values is None or pixel_values.size(0) == 0:
-        print(f"Warning: pixel_values is None or empty for image: {example['image_id']}")
-        return None
-
-    # Tokenize the caption
-    inputs = tokenizer(example["caption"], padding="max_length", max_length=128, truncation=True)
-
-    return {
-        "pixel_values": pixel_values,
-        "labels": torch.tensor(inputs["input_ids"], dtype=torch.long)
-    }
-
-# Process and save the dataset
+# Example usage
 if __name__ == "__main__":
-    data = load_data()
-    dataset = Dataset.from_list(data)
-    processed_dataset = dataset.map(lambda example: preprocess(example), remove_columns=dataset.column_names)
-    processed_dataset = processed_dataset.filter(lambda example: example is not None)
-    processed_dataset.save_to_disk("processed_dataset")
+    dataset = CurrencyDataset('dataset/annotations.json', 'images/')
+    print(f'Total samples: {len(dataset)}')
