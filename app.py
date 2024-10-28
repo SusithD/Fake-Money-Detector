@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 from skimage.metrics import structural_similarity as ssim
 import threading
-from transformers import VisionEncoderDecoderModel, ViTImageProcessor, AutoTokenizer
+from transformers import VisionEncoderDecoderModel, ViTImageProcessor, AutoTokenizer, AutoModel
 import torch
 from PIL import Image
 
@@ -39,22 +39,76 @@ gen_kwargs = {
 }
 
 def get_image_description(image_path):
+    # Load the image
     image = Image.open(image_path)
     if image.mode != "RGB":
         image = image.convert(mode="RGB")
 
+    # Convert the image to a numpy array for processing
+    image_cv = np.array(image)
+
+    # Preprocess the image
+    image_cv = preprocess_image(image_cv)  # Convert to grayscale
+    image_cv = denoise_image(image_cv)     # Denoise the image
+    image_cv = enhance_contrast(image_cv)   # Enhance contrast
+
+    # Ensure the image is 2D (grayscale) or 3D (color)
+    if len(image_cv.shape) == 2:  # Check if the image is 2D (height, width)
+        image_cv = np.expand_dims(image_cv, axis=-1)  # Add a channels dimension (height, width, 1)
+    
+    # If it's a single channel (grayscale), convert it to 3 channels
+    if image_cv.shape[-1] == 1:  
+        image_cv = np.repeat(image_cv, 3, axis=-1)  # Convert to (height, width, 3)
+
+    # Convert the preprocessed image back to PIL format
+    image = Image.fromarray(image_cv.astype(np.uint8))  # Ensure the dtype is uint8
+
+    # Convert the image to pixel values for the model
     pixel_values = feature_extractor(images=[image], return_tensors="pt").pixel_values.to(device)
+
+    # Create an attention mask that marks all tokens as valid (1s)
+    attention_mask = torch.ones(pixel_values.shape, device=device)
 
     # Create a more detailed prompt for the model
     prompt = (
-        "If you find 500 value on left side down corner or right side upper corner of the input image then front_description should be based on the value of the currency note: "
+        "Analyze the currency note in the image. Describe the visible features, "
+        "including the denomination, colors, patterns, and notable symbols. "
+        "If the denomination is visible, include it in the description. "
+        "Provide details about both the front and back of the note. "
+        "This is a currency note. Describe its features in detail, including "
+        "the denomination, any text present, notable figures, and background design. "
+        "Mention both sides of the note, if applicable. For instance, describe the "
+        "color scheme, patterns, and any holograms or security features. "
+        "For example, you could say: 'This is a Lkr 20 bill with a red background, "
+        "featuring a portrait of Andrew Jackson on the front and an image of the White House on the back.' "
+        "Focus on the denomination, color, and key designs. "
+        "This currency note should be analyzed for its features. Include the denomination, "
+        "main colors, patterns, symbols, and any security features such as watermarks, micro-text, "
+        "or holograms visible in the image. Provide descriptions for both the front and back sides."
     )
-    
+
     # Generate the description with the prompt
-    output_ids = model.generate(pixel_values, **gen_kwargs, do_sample=True, max_length=150)
-    
+    output_ids = model.generate(
+        pixel_values, 
+        attention_mask=attention_mask,
+        **gen_kwargs, 
+        do_sample=True, 
+        max_length=150
+    )
+
     description = tokenizer.decode(output_ids[0], skip_special_tokens=True)
     return description.strip()
+
+# Preprocessing functions
+def preprocess_image(image):
+    return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)  # Convert to grayscale
+
+def denoise_image(image):
+    return cv2.GaussianBlur(image, (5, 5), 0)  # Denoise using Gaussian blur
+
+def enhance_contrast(image):
+    return cv2.equalizeHist(image)  # Enhance contrast using histogram equalization
+
 
 
 # Load currency templates for validation
