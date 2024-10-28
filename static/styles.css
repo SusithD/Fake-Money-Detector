@@ -348,3 +348,35 @@ button:hover {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+
+.result, .authenticity, .description {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #e7e7e7;
+    color: #313131;
+}
+
+.authenticity {
+    background-color: #e7e7e7;
+    color: #2c2c2c;
+    margin-top: 30px;
+}
+
+.description {
+    background-color: #e7e7e7;
+    color: #333;
+    margin-top: 30px;
+}
+
+.description h2, .authenticity h2, .result h2 {
+    margin-bottom: 10px;
+    color: #222;
+}
+
+.description h3, .authenticity h3 {
+    font-size: 1.2rem;
+    color: #555;
+    margin-top: 15px;
+}

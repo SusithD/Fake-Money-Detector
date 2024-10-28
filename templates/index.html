@@ -46,23 +46,31 @@
             <div class="result">
                 <h2>Result:</h2>
                 <p>Detected Currency: <strong>{{ result }}</strong></p>
+            </div>
+
+            <div class="authenticity">
+                <h2>Authenticity Details:</h2>
                 <p>{{ authenticity_message }}</p>
-            
+            </div>
+
+            <div class="description">
+                <h2>Description</h2>
                 {% if front_description %}
-                    <h3>Front Image Description:</h3>
-                    <p>{{ front_description }}</p>
+                <h3>Front Image Description:</h3>
+                <p>{{ front_description }}</p>
                 {% endif %}
-            
+
                 {% if back_description %}
-                    <h3>Back Image Description:</h3>
-                    <p>{{ back_description }}</p>
+                <h3>Back Image Description:</h3>
+                <p>{{ back_description }}</p>
                 {% endif %}
-            </div>            
+            </div>
             {% elif authenticity_message %}
             <div class="error">
                 <p>{{ authenticity_message }}</p>
             </div>
             {% endif %}
+
         </section>
 
         <section class="technologies">

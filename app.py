@@ -7,8 +7,6 @@ import threading
 from transformers import VisionEncoderDecoderModel, ViTImageProcessor, AutoTokenizer
 import torch
 from PIL import Image
-import os
-
 
 
 # Set up paths and application configurations
@@ -17,6 +15,42 @@ UPLOAD_FOLDER = 'uploaded_notes/'
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Load model, processor, and tokenizer for image description
+model = VisionEncoderDecoderModel.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
+feature_extractor = ViTImageProcessor.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
+tokenizer = AutoTokenizer.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
+
+# Set device
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model.to(device)
+
+# Ensure pad_token_id is set to eos_token_id
+model.config.pad_token_id = model.config.eos_token_id
+
+# Generation parameters
+max_length = 20
+num_beams = 7
+temperature = 0.9
+top_k = 50
+gen_kwargs = {
+    "max_length": max_length,
+    "num_beams": num_beams,
+    "temperature": temperature,
+    "top_k": top_k
+}
+
+# Function to generate image description
+def get_image_description(image_path):
+    image = Image.open(image_path)
+    if image.mode != "RGB":
+        image = image.convert(mode="RGB")
+    
+    pixel_values = feature_extractor(images=[image], return_tensors="pt").pixel_values.to(device)
+    output_ids = model.generate(pixel_values, **gen_kwargs)
+    
+    description = tokenizer.decode(output_ids[0], skip_special_tokens=True)
+    return description.strip()
 
 # Load currency templates for validation
 def load_currency_templates():
@@ -114,21 +148,6 @@ def calculate_match_scores(input_front, input_back, templates, match_scores):
     # Wait for all threads to finish
     for thread in threads:
         thread.join()
-
-def get_image_description(image_path):
-    # Open the image file
-    with open(image_path, "rb") as image_file:
-        # Call the Vision model to get the description
-        response = openai.Image.create(
-            file=image_file,
-            purpose="description"
-        )
-
-    # Extract the description from the response
-    description = response['data'][0]['description']
-    
-    return description
-
 
 # Updated `identify_and_validate_currency` function with additional threading
 def identify_and_validate_currency(input_front_image_path, input_back_image_path, similarity_threshold=0.75):
